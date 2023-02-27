@@ -8,54 +8,83 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Follower(Base):
-    __tablename__ = 'Follower'
-    user_from_id = Column(Integer, ForeignKey("User.ID"), primary_key=True)
-    user_to_id = Column(Integer, ForeignKey("User.ID"))
-    #Relationship
-    User = relationship("User")
-
-
-class User(Base):
-    __tablename__ = 'User'
+class Planets(Base):
+    __tablename__ = 'Planets'
     ID = Column(Integer, primary_key=True)
-    username = Column(String(250))
-    firstname = Column(String(250), nullable=False)
-    lastname = Column(String(250), nullable=False)
-    email = Column(String(250), nullable=False)
+    Name = Column(String(100))
+    Rotation = Column(Integer)
+    Orbital_Period = Column(Integer)
+    Diameter = Column(Integer)
+    Climate = Column(String)
+    Gravity = Column(Integer)
+    Terrain = Column(String)
+    Population = Column(Integer, ForeignKey("Species.ID"))
+    Residents = Column(String, ForeignKey("People.ID"))
+    #Relationship
+    People = relationship("People")
+    Species = relationship("Species")
+    
+
+class People(Base):
+    __tablename__ = 'People'
+    ID = Column(Integer, primary_key=True)
+    Name = Column(String(100))
+    Height = Column(Integer)
+    Mass = Column(Integer)
+    Hair_Color = Column(String(50))
+    Eye_color = Column(String(50))
+    Birth_year = Column(Integer)
+    Homeworld = Column(String(100), ForeignKey("Planets.ID"))
+    Starships = Column(String(100), ForeignKey("Starships.ID"))
     #Relationship   
+    Planets = relationship("Planets")
+    Starships = relationship("Starships")
 
 
-    def to_dict(self):
+class Starships(Base):
+        __tablename__ = "Starships"
+        ID = Column(Integer, primary_key=True)
+        Name = Column(String(100))
+        Model = Column(String(250))
+        Manufacturer = Column(String(250))
+        Cost = Column(Integer)
+        Length = Column(Integer)
+        Max_Speed = Column(Integer)
+        Crew = Column(Integer)
+        Passengers = Column(Integer)
+        Cargo = Column(Integer)
+        Speed_Rating = Column(Integer)
+        Pilots = Column(String(100), ForeignKey("People.ID"))
+        #Relationships
+        People = relationship("People")
+
+
+class Species(Base):
+        __tablename__ = "Species"
+        ID = Column(Integer, primary_key=True)
+        Name = Column(String(100))
+        Classification = Column(String(250))
+        Designation = Column(String(250))
+        Average_Height = Column(Integer)
+        Average_Lifespan = Column(Integer)
+        Homeworld = Column(String(100), ForeignKey("Planets.ID"))
+        Language = Column(String(100))
+        People = Column(String(100), ForeignKey("People.ID"))
+        #  Relationships
+        Planets = relationship("Planets")
+        People = relationship("People")
+
+class Habitants_of_Planets(Base):
+        __tablename__ = "Habitants of Planets"
+        Planet_ID = Column(Integer, ForeignKey("Planets.ID"), primary_key=True)
+        People_ID = Column(Integer, ForeignKey("People.ID"))
+         #  Relationships
+        Planets = relationship("Planets")
+        People = relationship("People")
+
+
+def to_dict(self):
         return {}
-
-class Comment(Base):
-        __tablename__ = "Comment"
-        ID = Column(Integer, primary_key=True)
-        comment_text = Column(String(250), nullable=False)
-        author_id = Column(Integer, ForeignKey("User.ID"), nullable=False)
-        post_id = Column(Integer, ForeignKey("Post.ID"), nullable=False)
-
-        User = relationship("User")
-        Post = relationship("Post")
-
-
-class Media(Base):
-        __tablename__ = "Media"
-        ID = Column(Integer, primary_key=True)
-        type = Column(String(25), nullable=False)
-        url = Column(String(250))
-        post_id = Column(Integer, ForeignKey("Post.ID"), nullable=False)
-
-        Post = relationship("Post")
-
-class Post(Base):
-        __tablename__ = "Post"
-        ID = Column(Integer, primary_key=True)
-        user_id = Column(Integer, ForeignKey("User.ID"), primary_key=True)
-
-        User = relationship("User")
-
 ## Draw from SQLAlchemy base
 try:
     result = render_er(Base, 'diagram.png')
